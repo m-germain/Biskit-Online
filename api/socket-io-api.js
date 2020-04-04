@@ -8,6 +8,7 @@ app.get('/', function (req, res) {
 
 let players = new Map(); // Map of Id and Player name in playing order. [0] turn to play [1] next ...
 let jailList = new Map(); // Map of player in jail
+const currBiskitAnswers = []; // List of players whiches have said Biskit
 
 io.on('connection', function (socket) {
 
@@ -18,13 +19,21 @@ io.on('connection', function (socket) {
   });
 
   // Log whenever a client disconnects from our websocket server
-  socket.on("disconnect", function () {
+  socket.on("disconnect", () => {
     disconectPlayer(socket.id)
   });
 
   socket.on("roll", number => {
     sendDiceToPlayers(socket.id, number);
   });
+
+  socket.on("biskit", () => {
+    handleBiskit(socket.id);
+  })
+
+  socket.on("resetGame", () => {
+    resetGame(socket.id);
+  })
 });
 
 http.listen(3000, function () {
@@ -52,7 +61,7 @@ function sendDiceToPlayers(id, number) {
 }
 
 function calculateDice(id, number) {
-  if(basicRules(id, number[0], number[1]) == 0){
+  if (basicRules(id, number[0], number[1]) === 0) {
     nextPlayer(id);
   }
   return basicRules(id, number[0], number[1]);
@@ -62,7 +71,7 @@ function basicRules(id, dice1, dice2) {
   if (dice1 == dice2) return ("You can give a player : " + dice1 + " sips.");
   if ((dice1 + dice2) == 7) return ("Biskit !");
   if ((dice1 + dice2) == 3) {
-     return jail(id);
+    return jail(id);
   };
   if ((dice1 + dice2) == 11) return ("Player " + getPlayerFromIndex(1) + " take 1 sip !");
   if ((dice1 + dice2) == 10) {
@@ -108,6 +117,32 @@ function jail(id) {
 function nextPlayer(id) {
   let playerName = players.get(id);
   players.delete(id);
-  players.set(id,playerName);
+  players.set(id, playerName);
   sendListPlayer();
+}
+
+function handleBiskit(id) {
+  if (currBiskitAnswers.length === players.size - 1) {
+    // Calculate looser
+    const looserId = [...players.keys()].filter((id) => !currBiskitAnswers.include(id))[0];
+
+    if (looserId !== id) {
+      io.emit("bizkitEnd", { type: "biskitAnswers", looserId: looserId, biskitAnswers: currBiskitAnswers });
+    } else {
+      io.emit("bizkitEnd", { type: "biskitAnswers", looserId: looserId, biskitAnswers: currBiskitAnswers });
+      nextPlayer(id);
+    }
+  } else {
+    currBiskitAnswers.push(id);
+    io.emit("event", { message: `${getPlayerFromIndex(id)} a répondu Bizkit` });
+  }
+}
+
+function resetGame(id) {
+  io.emit("resetGame", { message: ("Game was restarted by :" + players.get(id)) });
+  console.log(("Game was restarted by :" + players.get(id)));
+  //clean tout
+  players = new Map();
+  jailList = new Map(); 
+  currBiskitAnswers = [];
 }
