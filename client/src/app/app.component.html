@@ -1,0 +1,83 @@
+<mat-toolbar>
+  <span>Biskit Online</span>
+</mat-toolbar>
+
+<div class="listPlayer" *ngIf="playerList">
+  <h4 style="text-align: right; margin-right: 0.3em;">Online Player</h4>
+  <player-card *ngFor="let player of playerList" [player]="player"></player-card>
+</div>
+
+<div class="dice" style="width: 30%; height: 50%; margin: auto; margin-left: 1em;">
+  <ol class="die-list even-roll" data-roll="1" id="die-1">
+    <li class="die-item" data-side="1">
+      <span class="dot"></span>
+    </li>
+    <li class="die-item" data-side="2">
+      <span class="dot"></span>
+      <span class="dot"></span>
+    </li>
+    <li class="die-item" data-side="3">
+      <span class="dot"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
+    </li>
+    <li class="die-item" data-side="4">
+      <span class="dot"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
+    </li>
+    <li class="die-item" data-side="5">
+      <span class="dot"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
+    </li>
+    <li class="die-item" data-side="6">
+      <span class="dot"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
+    </li>
+  </ol>
+  <ol class="die-list odd-roll" data-roll="1" id="die-2">
+    <li class="die-item" data-side="1">
+      <span class="dot"></span>
+    </li>
+    <li class="die-item" data-side="2">
+      <span class="dot"></span>
+      <span class="dot"></span>
+    </li>
+    <li class="die-item" data-side="3">
+      <span class="dot"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
+    </li>
+    <li class="die-item" data-side="4">
+      <span class="dot"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
+    </li>
+    <li class="die-item" data-side="5">
+      <span class="dot"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
+    </li>
+    <li class="die-item" data-side="6">
+      <span class="dot"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
+    </li>
+  </ol>
+</div>
+
+<button mat-stroke-button (click)="startRolling()" *ngIf="canPlay()" color="warn"> Roll Dice </button>
