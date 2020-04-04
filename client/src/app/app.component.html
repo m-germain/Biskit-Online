@@ -2,13 +2,27 @@
   <span>Bizkit Online</span>
 </mat-toolbar>
 
+<button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Example icon-button with a menu">
+  <mat-icon>more_vert</mat-icon>
+</button>
+<mat-menu #menu="matMenu">
+  <button mat-menu-item (click)="resetGame()">
+    <mat-icon>autorenew</mat-icon>
+    <span>Reset</span>
+  </button>
+  <button mat-menu-item>
+    <mat-icon>face</mat-icon>
+    <span>Profile</span>
+  </button>
+</mat-menu>
+
 <div class="listPlayer" *ngIf="playerList">
   <h4 style="text-align: right; margin-right: 0.3em;">Online Player</h4>
   <player-card *ngFor="let player of playerList" [player]="player"></player-card>
 </div>
 
 <div class="dice" style="width: 30%; height: 50%; margin: auto; margin-left: 1em;">
-  <ol class="die-list even-roll" data-roll="1" id="die-1">
+  <ol class="die-list even-roll" data-roll="1" id="die-1" *ngIf="false">
     <li class="die-item" data-side="1">
       <span class="dot"></span>
     </li>
@@ -80,4 +94,7 @@
   </ol>
 </div>
 
-<button mat-button (click)="startRolling()" *ngIf="canPlay()" color="warn"> Roll Dice </button>
+<button mat-button (click)="startRolling()" *ngIf="canPlay()" color="warn">
+  <mat-icon>play</mat-icon>
+  <span>Roll Dice</span>
+</button>

@@ -1,10 +1,11 @@
 import { Component, OnInit, OnDestroy, Inject } from '@angular/core';
 import { WebSocketService } from './web-socket.service';
-import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
+import { MatDialog, MatDialogConfig, MatDialogRef } from '@angular/material/dialog';
 import { Player } from 'src/models/player';
 import { PlayerCard } from './other/player-card/player-card/player-card.component';
 import { PickName } from './other/pick-name/pick-name/pick-name.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { ConfirmationDialog } from './other/confirmation-dialog/confirmation-dialog.component';
 
 @Component({
   selector: 'app-root',
@@ -37,8 +38,19 @@ export class AppComponent implements OnInit, OnDestroy {
     // New Dice roll to display
     this.webSocketService.listen('roll').subscribe((data: any) => {
       console.log(data);
-      this.openSnackBar(data.rule, "Okey");
+      this.openSnackBar(data.rule, "Okey"); // Ici gérer les types d'event Bizkit ect...
       this.rollDice(data.number);
+    })
+
+    // New Dice roll to display
+    this.webSocketService.listen('roll').subscribe((data: any) => {
+      this.openSnackBar(data.rule, "Okey");
+    })
+
+    // Reset Game
+    this.webSocketService.listen('resetGame').subscribe((data: any) => {
+      this.openSnackBar(data.message, "Okey :(");
+      this.resetGame();
     })
 
     this.openNameSelection();
@@ -116,9 +128,33 @@ export class AppComponent implements OnInit, OnDestroy {
 
   openSnackBar(message: string, action: string) {
     if (message != "0") {
-      this._snackBar.open(message, action, {
-        duration: 2000,
+      let snackBarRef =this._snackBar.open(message, action, {
+        duration: 8000,
+      });
+      snackBarRef.onAction().subscribe(() => {
+        //this.webSocketService.emit('bizkit',null);
+        console.log('The snack-bar action was triggered!');
       });
     }
+  }
+
+  sendResetGame() {
+    const dialogRef = this.dialog.open(ConfirmationDialog, {
+      disableClose: false
+    });
+    dialogRef.componentInstance.confirmMessage = "Are you sure you want to reset the Game ?"
+
+    dialogRef.afterClosed().subscribe(result => {
+      if(result) {
+        this.webSocketService.emit('resetGame',null);
+      }
+    });
+  }
+
+  resetGame() { 
+    this.player = new Player(null, null);
+    this.playerList = [];
+    this.curentPlayer = false;
+    this.openNameSelection();
   }
 }
